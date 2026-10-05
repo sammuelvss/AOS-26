@@ -11,19 +11,18 @@ const getAllowedOrigins = () => {
 
 export const corsOptions = {
   origin: (origin, callback) => {
-    // Sem Origin (!origin): aceita requisições de apps mobile nativos (Expo / React Native), Postman e cURL
     if (!origin) {
       return callback(null, true);
     }
 
     const allowedOrigins = getAllowedOrigins();
 
-    // Origem na lista permitida
+    
     if (allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
 
-    // Origem não permitida: bloqueia no cliente sem lançar exceções no servidor
+   
     return callback(null, false);
   },
   credentials: true,
