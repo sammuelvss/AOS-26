@@ -15,16 +15,16 @@ app.use(corsMiddleware);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Rota principal através do Barrel Pattern
+
 app.use('/', routes);
 
-// Middleware Global de Erro
+
 app.use((err, req, res, next) => {
   let error = { ...err };
   error.message = err.message;
   error.name = err.name;
   
-  // Mapeamento de erros do Sequelize
+
   if (error.name === 'SequelizeValidationError') {
     const messages = err.errors.map(e => e.message);
     error = new AppError(`Erro de validação: ${messages.join(', ')}`, 400);
