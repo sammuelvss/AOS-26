@@ -1,17 +1,19 @@
 import 'dotenv/config';
 import express from 'express';
-import cors from 'cors';
+import helmet from 'helmet';
+import corsMiddleware from './middlewares/cors.js';
+import routes from './routes/index.js';
+import { AppError } from './utils/appError.js';
+import { sequelize } from './config/database.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middlewares
+app.use(helmet());
+app.use(corsMiddleware);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors());
-import routes from './routes/index.js';
-import { AppError } from './utils/appError.js';
-import { sequelize } from './config/database.js';
 
 // Rota principal através do Barrel Pattern
 app.use('/', routes);
