@@ -2,6 +2,14 @@ import { User } from '../models/User.js';
 import { AppError } from '../utils/appError.js';
 
 export const userService = {
+  async getUserById(id) {
+    const user = await User.findByPk(id);
+    if (!user) {
+      throw new AppError('User not found', 404);
+    }
+    return user;
+  },
+
   async createUser(data) {
     return await User.create(data);
   },

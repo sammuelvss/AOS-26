@@ -1,13 +1,13 @@
 import 'dotenv/config';
+import { env } from './utils/env.js';
 import express from 'express';
 import helmet from 'helmet';
-import { corsMiddleware, limiter } from './middlewares/index.js';
+import { corsMiddleware, limiter, errorHandler } from './middlewares/index.js';
 import routes from './routes/index.js';
-import { AppError } from './utils/index.js';
 import { sequelize } from './config/database.js';
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = env.PORT;
 
 app.set('trust proxy', true);
 
@@ -17,40 +17,9 @@ app.use(limiter);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-
 app.use('/', routes);
 
-
-app.use((err, req, res, next) => {
-  let error = { ...err };
-  error.message = err.message;
-  error.name = err.name;
-  
-
-  if (error.name === 'SequelizeValidationError') {
-    const messages = err.errors.map(e => e.message);
-    error = new AppError(`Erro de validação: ${messages.join(', ')}`, 400);
-  }
-  
-  if (error.name === 'SequelizeUniqueConstraintError') {
-    error = new AppError('Registro já existe (conflito de duplicidade).', 409);
-  }
-
-  const statusCode = error.statusCode || 500;
-  const status = error.status || 'error';
-  const message = error.isOperational ? error.message : 'Algo deu errado no servidor';
-
-  const response = {
-    status,
-    message,
-  };
-
-  if (process.env.NODE_ENV === 'development') {
-    response.stack = err.stack;
-  }
-
-  res.status(statusCode).json(response);
-});
+app.use(errorHandler);
 
 // Inicialização do servidor apenas fora do ambiente serverless da Vercel
 if (!process.env.VERCEL) {

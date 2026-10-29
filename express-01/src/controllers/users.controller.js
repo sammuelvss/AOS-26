@@ -6,29 +6,34 @@ export const getUsers = async (req, res) => {
   res.status(200).json(users);
 };
 
+export const getUserById = async (req, res) => {
+  const userId = req.params.userId || req.params.id;
+  const user = await userService.getUserById(userId);
+  res.status(200).json(user);
+};
+
 export const createUser = async (req, res) => {
-  const { name } = req.body;
-  if (!name) {
+  const { username, email, name } = req.body;
+  const userName = username || name;
+  if (!userName) {
     throw new AppError('Nome é obrigatório', 400);
   }
-  const user = await userService.createUser({ name });
+  const user = await userService.createUser({ name: userName, email });
   res.status(201).json({ message: 'Usuário criado', user });
 };
 
 export const updateUser = async (req, res) => {
-  const { id } = req.params;
-  const { name } = req.body;
-  
-  // Note: if user not found, userService.updateUser will throw an Error, 
-  // we could map it to an AppError there, but let's just let it propagate 
-  // or wrap it. For now, it will be caught by Express.
-  const user = await userService.updateUser(id, { name });
+  const userId = req.params.userId || req.params.id;
+  const { username, name } = req.body;
+  const userName = username || name;
+
+  const user = await userService.updateUser(userId, { name: userName });
   res.status(200).json({ message: 'Usuário atualizado', user });
 };
 
 export const deleteUser = async (req, res) => {
-  const { id } = req.params;
-  await userService.deleteUser(id);
+  const userId = req.params.userId || req.params.id;
+  await userService.deleteUser(userId);
   res.status(204).send();
 };
 
