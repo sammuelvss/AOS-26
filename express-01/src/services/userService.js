@@ -1,33 +1,36 @@
-import { User } from '../models/User.js';
-import { AppError } from '../utils/appError.js';
+import { User } from '../models/index.js';
+import { AppError } from '../utils/index.js';
 
 export const userService = {
-  async getUserById(id) {
-    const user = await User.findByPk(id);
+  async getUsers() {
+    return await User.findAll();
+  },
+
+  async getUserById(userId) {
+    const user = await User.findByPk(userId);
     if (!user) {
-      throw new AppError('User not found', 404);
+      throw new AppError('Usuário não encontrado.', 404);
     }
     return user;
   },
 
-  async createUser(data) {
-    return await User.create(data);
+  async createUser({ username, email }) {
+    return await User.create({ username, email });
   },
 
-  async updateUser(id, data) {
-    const user = await User.findByPk(id);
-    if (!user) {
-      throw new AppError('User not found', 404);
-    }
-    return await user.update(data);
+  async updateUser(userId, data) {
+    const user = await this.getUserById(userId);
+    if (data.username !== undefined) user.username = data.username;
+    if (data.email !== undefined) user.email = data.email;
+    await user.save();
+    return user;
   },
 
-  async deleteUser(id) {
-    const user = await User.findByPk(id);
-    if (!user) {
-      throw new AppError('User not found', 404);
-    }
+  async deleteUser(userId) {
+    const user = await this.getUserById(userId);
     await user.destroy();
     return true;
-  }
+  },
 };
+
+export default userService;

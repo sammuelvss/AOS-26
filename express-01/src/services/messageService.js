@@ -1,5 +1,5 @@
-import { Message } from '../models/Message.js';
-import { AppError } from '../utils/appError.js';
+import { Message } from '../models/index.js';
+import { AppError } from '../utils/index.js';
 
 export const messageService = {
   async getMessages() {
@@ -9,29 +9,29 @@ export const messageService = {
   async getMessageById(messageId) {
     const message = await Message.findByPk(messageId);
     if (!message) {
-      throw new AppError('Message not found', 404);
+      throw new AppError('Mensagem não encontrada.', 404);
     }
     return message;
   },
 
-  async createMessage(data) {
-    return await Message.create(data);
+  async createMessage({ text, userId }) {
+    return await Message.create({ text, userId });
   },
 
-  async updateMessage(messageId, data) {
-    const message = await Message.findByPk(messageId);
-    if (!message) {
-      throw new AppError('Message not found', 404);
+  async updateMessage(messageId, { text }) {
+    const message = await this.getMessageById(messageId);
+    if (text !== undefined) {
+      message.text = text;
     }
-    return await message.update(data);
+    await message.save();
+    return message;
   },
 
   async deleteMessage(messageId) {
-    const message = await Message.findByPk(messageId);
-    if (!message) {
-      throw new AppError('Message not found', 404);
-    }
+    const message = await this.getMessageById(messageId);
     await message.destroy();
     return true;
-  }
+  },
 };
+
+export default messageService;

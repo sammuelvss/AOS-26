@@ -1,14 +1,13 @@
 import { Router } from 'express';
-import homeRoutes from './home.routes.js';
-import usersRoutes from './users.routes.js';
-import messageRoutes from './message.routes.js';
-import sessionRoutes from './session.js';
+import tarefaRoutes from './tarefa.js';
+import userRoutes from './user.js';
+import messageRoutes from './message.js';
 
 const routes = Router();
 
-routes.use('/', homeRoutes);
-routes.use('/users', usersRoutes);
+routes.use('/tarefas', tarefaRoutes);
+routes.use('/users', userRoutes);
 routes.use('/messages', messageRoutes);
-routes.use('/session', sessionRoutes);
 
+export { tarefaRoutes, userRoutes, messageRoutes };
 export default routes;

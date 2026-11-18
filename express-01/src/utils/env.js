@@ -1,12 +1,18 @@
+import 'dotenv/config';
 import { z } from 'zod';
 
 export const envSchema = z.object({
-  DATABASE_URL: z.string({ error: 'DATABASE_URL é obrigatória' }).url('DATABASE_URL deve ser uma URL válida'),
-  PORT: z.coerce.number().default(4001),
+  DATABASE_URL: z
+    .string({ error: 'DATABASE_URL é obrigatória' })
+    .min(1, 'DATABASE_URL é obrigatória')
+    .url('DATABASE_URL deve ser uma URL válida'),
+  PORT: z.coerce.number().int().positive().default(4001),
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
-  ALLOWED_ORIGINS: z.string({ error: 'ALLOWED_ORIGINS é obrigatória' }).min(1, 'ALLOWED_ORIGINS não pode ser vazia'),
-  JWT_SECRET: z
-    .preprocess((val) => val ?? process.env.MY_SECRET, z.string({ error: 'JWT_SECRET é obrigatória' }).min(10, 'JWT_SECRET deve ter no mínimo 10 caracteres')),
+  ALLOWED_ORIGINS: z
+    .string()
+    .min(1, 'ALLOWED_ORIGINS não pode ser vazia')
+    .default('http://localhost:3000,http://localhost:4001'),
+  JWT_SECRET: z.string().min(1).optional(),
 });
 
 const result = envSchema.safeParse(process.env);
@@ -18,4 +24,4 @@ if (!result.success) {
 }
 
 export const env = result.data;
-
+export default env;

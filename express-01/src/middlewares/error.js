@@ -8,7 +8,7 @@ export const errorHandler = (err, req, res, next) => {
 
     return res.status(400).json({
       status: 'fail',
-      message: errors.join('; '),
+      message: issues[0]?.message || 'Erro de validação nos dados enviados.',
       errors,
     });
   }
@@ -43,4 +43,3 @@ export const errorHandler = (err, req, res, next) => {
 };
 
 export default errorHandler;
-
